@@ -2,9 +2,9 @@ Make JSON REST AJAX requests with redux-thunk
 
 Usage:
 
-    import { createStore, combineReducers } from 'redux'
-    import 'redux-thunk'
-    import { ajaxThunk } from 'redux-thunk-ajax'
+    import { createStore, applyMiddleware, combineReducers } from 'redux'
+    import thunk from 'redux-thunk'
+    import ajaxThunk from 'redux-thunk-ajax'
     const LOGIN_ACTIONS = {
         request: "LOGIN",
         complete: "LOGIN_COMPLETE",
@@ -40,6 +40,6 @@ Usage:
       }
     };
     let reducer = combineReducers({ auth });
-    let store = createStore(reducer);
+    let store = createStore(reducer, applyMiddleware(thunk));
     store.dispatch(login({ username: 'tim', password: 'bigSecret' }));
 
