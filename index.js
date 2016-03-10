@@ -1,61 +1,62 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ajax = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Promise, ajax,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 Promise = require("bluebird");
 
-ajax = Promise.promisify(function(action, json, callback) {
-  var complete, err, error1, req;
-  req = new XMLHttpRequest();
-  complete = function() {
-    var ref, result, successResultCodes;
-    if (req.readyState === 4) {
-      successResultCodes = [200, 304];
-      result = JSON.parse(req.responseText);
-      if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
-        return callback(null, result);
-      } else {
-        result.status = req.status;
-        return callback(result, null);
+ajax = function(action, json) {
+  return new Promise(function(resolve, reject) {
+    var complete, err, error, req;
+    req = new XMLHttpRequest();
+    complete = function() {
+      var ref, result, successResultCodes;
+      if (req.readyState === 4) {
+        successResultCodes = [200, 304];
+        result = JSON.parse(req.responseText);
+        if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
+          return resolve(result);
+        } else {
+          result.status = req.status;
+          return reject(result);
+        }
       }
+    };
+    req.addEventListener("readystatechange", complete, false);
+    try {
+      req.open("POST", action);
+      req.setRequestHeader("Content-Type", "application/json");
+      return req.send(JSON.stringify(json));
+    } catch (error) {
+      err = error;
+      return reject(JSON.parse(err));
     }
-  };
-  req.addEventListener("readystatechange", complete, false);
-  try {
-    req.open("POST", action);
-    req.setRequestHeader("Content-Type", "application/json");
-    return req.send(JSON.stringify(json));
-  } catch (error1) {
-    err = error1;
-    err = JSON.parse(err);
-    return callback(err, null);
-  }
-});
+  });
+};
 
-module.exports = function(endpoint, ticket, action, done, error) {
+module.exports = function(endpoint, actions, ticket) {
   return function(dispatch) {
-    var err, error1;
+    var err, error;
     dispatch({
-      type: action,
+      type: actions.request,
       ticket: ticket
     });
     try {
       return ajax(endpoint, ticket).then(function(result) {
         return dispatch(_.assign(result, {
-          type: done,
+          type: actions.complete,
           time: new Date()
         }));
       })["catch"](function(err) {
         return dispatch({
-          type: error,
+          type: actions.error,
           message: err
         });
       });
-    } catch (error1) {
-      err = error1;
+    } catch (error) {
+      err = error;
       return dispatch({
-        type: error,
-        message: err.message
+        type: actions.error,
+        error: err.message
       });
     }
   };
@@ -5571,4 +5572,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[1]);
+},{}]},{},[1])(1)
+});

@@ -11,16 +11,13 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "node node_modules/browserify/bin/cmd.js -t [ coffeeify --bare=true ] index.coffee -o index.js"
+    "build": "node node_modules/browserify/bin/cmd.js -t [ coffeeify --bare=true ] index.coffee --standalone ajax -o index.js"
   },
   "dependencies": {
-    "redux": "^3.3.1",
-    "redux-thunk": "^1.0.3"
+    "bluebird": "^3.3.4"
   },
   "devDependencies": {
-    "bluebird": "^3.3.4",
     "browserify": "^13.0.0",
-    "coffeeify": "^2.0.1",
-    "uglify": "^0.1.5"
+    "coffeeify": "^2.0.1"
   }
 }
