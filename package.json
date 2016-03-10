@@ -1,0 +1,26 @@
+{
+  "author": "Tim Garthwaite <tim@mividstudios.com>",
+  "name": "redux-thunk-ajax",
+  "description": "Make JSON REST AJAX requests with redux-thunk",
+  "version": "0.1.1",
+  "license": "MIT",
+  "homepage": "https://github.com/mividtim/redux-thunk-ajax",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mividtim/redux-thunk-ajax.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "node node_modules/browserify/bin/cmd.js -t coffeeify index.coffee -o index.js"
+  },
+  "dependencies": {
+    "redux": "^3.3.1",
+    "redux-thunk": "^1.0.3"
+  },
+  "devDependencies": {
+    "bluebird": "^3.3.4",
+    "browserify": "^13.0.0",
+    "coffeeify": "^2.0.1",
+    "uglify": "^0.1.5"
+  }
+}
