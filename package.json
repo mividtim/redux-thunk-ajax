@@ -2,7 +2,7 @@
   "author": "Tim Garthwaite <tim@mividstudios.com>",
   "name": "redux-thunk-ajax",
   "description": "Make JSON REST AJAX requests with redux-thunk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "homepage": "https://github.com/mividtim/redux-thunk-ajax",
   "repository": {
@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "node node_modules/browserify/bin/cmd.js -t coffeeify index.coffee -o index.js"
+    "build": "node node_modules/browserify/bin/cmd.js -t [ coffeeify --bare=true ] index.coffee -o index.js"
   },
   "dependencies": {
     "redux": "^3.3.1",
