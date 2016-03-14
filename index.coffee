@@ -21,13 +21,13 @@ ajax = (action, json) ->
     catch err
       reject JSON.parse err
 
-module.exports = (endpoint, actions, ticket) ->
-  (dispatch) ->
-    dispatch type: actions.request, ticket: ticket
-    try
-      ajax endpoint, ticket
-        .then (result) -> dispatch assign result, type: actions.complete, time: new Date()
-        .catch (err) -> dispatch type: actions.error, message: err
-    catch err
-      dispatch type: actions.error, error: err.message
-
+module.exports = (endpoint, actions, ticket, onlyif = -> yes) ->
+  (dispatch, getState) ->
+    if onlyif getState
+      dispatch type: actions.request, ticket: ticket
+      try
+        ajax endpoint, ticket
+          .then (result) -> dispatch assign result, type: actions.complete, time: new Date()
+          .catch (err) -> dispatch type: actions.error, message: err
+      catch err
+        dispatch type: actions.error, error: err.message

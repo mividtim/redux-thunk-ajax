@@ -35,31 +35,38 @@ ajax = function(action, json) {
   });
 };
 
-module.exports = function(endpoint, actions, ticket) {
-  return function(dispatch) {
+module.exports = function(endpoint, actions, ticket, onlyif) {
+  if (onlyif == null) {
+    onlyif = function() {
+      return true;
+    };
+  }
+  return function(dispatch, getState) {
     var err, error;
-    dispatch({
-      type: actions.request,
-      ticket: ticket
-    });
-    try {
-      return ajax(endpoint, ticket).then(function(result) {
-        return dispatch(assign(result, {
-          type: actions.complete,
-          time: new Date()
-        }));
-      })["catch"](function(err) {
+    if (onlyif(getState)) {
+      dispatch({
+        type: actions.request,
+        ticket: ticket
+      });
+      try {
+        return ajax(endpoint, ticket).then(function(result) {
+          return dispatch(assign(result, {
+            type: actions.complete,
+            time: new Date()
+          }));
+        })["catch"](function(err) {
+          return dispatch({
+            type: actions.error,
+            message: err
+          });
+        });
+      } catch (error) {
+        err = error;
         return dispatch({
           type: actions.error,
-          message: err
+          error: err.message
         });
-      });
-    } catch (error) {
-      err = error;
-      return dispatch({
-        type: actions.error,
-        error: err.message
-      });
+      }
     }
   };
 };
