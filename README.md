@@ -10,7 +10,9 @@ Usage:
         complete: "LOGIN_COMPLETE",
         error: "LOGIN_ERROR"
     };
-    const login = ajaxThunk("/auth/login", LOGIN_ACTIONS);
+    // Avoid double-dispatching by including onlyif closure, to which is passed
+    // the getState method from the store
+    const login = ajaxThunk("/auth/login", LOGIN_ACTIONS, (getState) => !getState().auth.loggingIn);
     const auth = function(state = {}, action) {
       switch(action.type) {
         case LOGIN_ACTIONS.request:
