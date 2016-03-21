@@ -5,9 +5,9 @@
 
   Promise = require("bluebird");
 
-  ajax = function(action, json) {
+  ajax = function(options) {
     return new Promise(function(resolve, reject) {
-      var complete, err, error1, req;
+      var complete, err, error1, key, ref, req, value;
       req = new XMLHttpRequest();
       complete = function() {
         var ref, result, successResultCodes;
@@ -24,47 +24,55 @@
       };
       req.addEventListener("readystatechange", complete, false);
       try {
-        req.open("POST", action);
+        req.open("POST", options.url);
         req.setRequestHeader("Content-Type", "application/json");
-        return req.send(JSON.stringify(json));
+        ref = options.headers || {};
+        for (key in ref) {
+          value = ref[key];
+          req.setRequestHeader(key, value);
+        }
+        return req.send(JSON.stringify(options.payload));
       } catch (error1) {
         err = error1;
-        return reject(JSON.parse(err));
+        return reject(err);
       }
     });
   };
 
-  module.exports = function(endpoint, actions, ticket, onlyif) {
-    if (onlyif == null) {
-      onlyif = function() {
-        return true;
-      };
-    }
+  module.exports = function(options) {
+    var headers;
+    headers = options.headers || {};
     return function(dispatch, getState) {
-      var error, error1;
-      if (onlyif(getState)) {
+      var error, error1, key, ref, value;
+      options.headers = headers;
+      ref = typeof options.getHeaders === "function" ? options.getHeaders(getState) : void 0;
+      for (key in ref) {
+        value = ref[key];
+        options.headers[key] = value;
+      }
+      if ((options.onlyif == null) || options.onlyif(getState)) {
         dispatch({
-          type: actions.request,
-          ticket: ticket
+          type: options.actions.request,
+          payload: options.payload
         });
         try {
-          return ajax(endpoint, ticket).then(function(response) {
+          return ajax(options).then(function(response) {
             return dispatch({
               response: response,
-              type: actions.complete,
+              type: options.actions.complete,
               time: new Date()
             });
           })["catch"](function(error) {
             return dispatch({
-              type: actions.error,
+              type: options.actions.error,
               message: error
             });
           });
         } catch (error1) {
           error = error1;
           return dispatch({
-            type: actions.error,
-            error: error.message
+            type: options.actions.error,
+            message: error.message
           });
         }
       }

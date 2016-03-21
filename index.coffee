@@ -1,6 +1,6 @@
 Promise = require "bluebird"
 
-ajax = (action, json) ->
+ajax = (options) ->
   new Promise (resolve, reject) ->
     req = new XMLHttpRequest()
     complete = ->
@@ -12,21 +12,25 @@ ajax = (action, json) ->
         else
           result.status = req.status
           reject result
-    req.addEventListener "readystatechange", complete, false
+    req.addEventListener "readystatechange", complete, no
     try
-      req.open "POST", action
+      req.open "POST", options.url
       req.setRequestHeader "Content-Type", "application/json"
-      req.send JSON.stringify json
+      req.setRequestHeader key, value for key, value of options.headers or {}
+      req.send JSON.stringify options.payload
     catch err
-      reject JSON.parse err
+      reject err
 
-module.exports = (endpoint, actions, ticket, onlyif = -> yes) ->
+module.exports = (options) ->
+  headers = options.headers or {}
   (dispatch, getState) ->
-    if onlyif getState
-      dispatch type: actions.request, ticket: ticket
+    options.headers = headers
+    options.headers[key] = value for key, value of options.getHeaders? getState
+    if not options.onlyif? or options.onlyif getState
+      dispatch type: options.actions.request, payload: options.payload
       try
-        ajax endpoint, ticket
-          .then (response) -> dispatch response: response, type: actions.complete, time: new Date()
-          .catch (error) -> dispatch type: actions.error, message: error
+        ajax options
+          .then (response) -> dispatch response: response, type: options.actions.complete, time: new Date()
+          .catch (error) -> dispatch type: options.actions.error, message: error
       catch error
-        dispatch type: actions.error, error: error.message
+        dispatch type: options.actions.error, message: error.message
