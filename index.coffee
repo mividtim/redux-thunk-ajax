@@ -1,5 +1,4 @@
 Promise = require "bluebird"
-assign = require "lodash.assign"
 
 ajax = (action, json) ->
   new Promise (resolve, reject) ->
@@ -27,7 +26,7 @@ module.exports = (endpoint, actions, ticket, onlyif = -> yes) ->
       dispatch type: actions.request, ticket: ticket
       try
         ajax endpoint, ticket
-          .then (result) -> dispatch assign result, type: actions.complete, time: new Date()
-          .catch (err) -> dispatch type: actions.error, message: err
-      catch err
-        dispatch type: actions.error, error: err.message
+          .then (response) -> dispatch response: response, type: actions.complete, time: new Date()
+          .catch (error) -> dispatch type: actions.error, message: error
+      catch error
+        dispatch type: actions.error, error: error.message
