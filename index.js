@@ -26,7 +26,7 @@
       try {
         req.open("POST", options.url);
         req.setRequestHeader("Content-Type", "application/json");
-        ref = options.headers || {};
+        ref = options.headers;
         for (key in ref) {
           value = ref[key];
           req.setRequestHeader(key, value);

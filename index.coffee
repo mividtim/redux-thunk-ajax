@@ -16,7 +16,7 @@ ajax = (options) ->
     try
       req.open "POST", options.url
       req.setRequestHeader "Content-Type", "application/json"
-      req.setRequestHeader key, value for key, value of options.headers or {}
+      req.setRequestHeader key, value for key, value of options.headers
       req.send JSON.stringify options.payload
     catch err
       reject err
@@ -30,7 +30,9 @@ module.exports = (options) ->
       dispatch type: options.actions.request, payload: options.payload
       try
         ajax options
-          .then (response) -> dispatch response: response, type: options.actions.complete, time: new Date()
-          .catch (error) -> dispatch type: options.actions.error, message: error
+          .then (response) ->
+            dispatch response: response, type: options.actions.complete, time: new Date()
+          .catch (error) ->
+            dispatch type: options.actions.error, message: error
       catch error
         dispatch type: options.actions.error, message: error.message
