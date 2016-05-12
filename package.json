@@ -2,7 +2,7 @@
   "author": "Tim Garthwaite <tim@mividstudios.com>",
   "name": "redux-thunk-ajax",
   "description": "Make JSON REST AJAX requests with redux-thunk",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "license": "MIT",
   "homepage": "https://github.com/mividtim/redux-thunk-ajax",
   "repository": {
