@@ -1,64 +1,59 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ajax = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Promise, ajax, err, error1, error2, key, ref, ref1, result, value,
+var Promise, ajax,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 Promise = require("bluebird");
 
 ajax = function(options) {
   return new Promise(function(resolve, reject) {
-    var complete, req;
+    var complete, err, error1, key, ref, req, value;
     req = new XMLHttpRequest();
-    return complete = function() {
-      var successResultCodes;
+    complete = function() {
+      var error1, ref, result, successResultCodes;
       if (req.readyState === 4) {
-        return successResultCodes = [200, 304];
+        successResultCodes = [200, 304];
+        result = {};
+        try {
+          result = JSON.parse(req.responseText);
+        } catch (error1) {
+          result = {
+            message: req.responseText
+          };
+        }
+        if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
+          return resolve(result);
+        } else {
+          result.status = req.status;
+          return reject(result);
+        }
       }
     };
+    req.addEventListener("readystatechange", complete, false);
+    try {
+      req.open("POST", options.url);
+      req.setRequestHeader("Content-Type", "application/json");
+      ref = options.headers;
+      for (key in ref) {
+        value = ref[key];
+        req.setRequestHeader(key, value);
+      }
+      return req.send(JSON.stringify(options.payload));
+    } catch (error1) {
+      err = error1;
+      return reject(err);
+    }
   });
 };
-
-result = {};
-
-try {
-  result = JSON.parse(req.responseText);
-} catch (error1) {
-  result = {
-    message: req.responseText
-  };
-}
-
-if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
-  resolve(result);
-} else {
-  result.status = req.status;
-  reject(result);
-}
-
-req.addEventListener("readystatechange", complete, false);
-
-try {
-  req.open("POST", options.url);
-  req.setRequestHeader("Content-Type", "application/json");
-  ref1 = options.headers;
-  for (key in ref1) {
-    value = ref1[key];
-    req.setRequestHeader(key, value);
-  }
-  req.send(JSON.stringify(options.payload));
-} catch (error2) {
-  err = error2;
-  reject(err);
-}
 
 module.exports = function(options) {
   var headers;
   headers = options.headers || {};
   return function(dispatch, getState) {
-    var error, error3, ref2;
+    var error, error1, key, ref, value;
     options.headers = headers;
-    ref2 = typeof options.getHeaders === "function" ? options.getHeaders(getState) : void 0;
-    for (key in ref2) {
-      value = ref2[key];
+    ref = typeof options.getHeaders === "function" ? options.getHeaders(getState) : void 0;
+    for (key in ref) {
+      value = ref[key];
       options.headers[key] = value;
     }
     if ((options.onlyif == null) || options.onlyif(getState)) {
@@ -79,8 +74,8 @@ module.exports = function(options) {
             message: error
           });
         });
-      } catch (error3) {
-        error = error3;
+      } catch (error1) {
+        error = error1;
         return dispatch({
           type: options.actions.error,
           message: error.message
