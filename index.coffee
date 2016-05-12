@@ -6,7 +6,11 @@ ajax = (options) ->
     complete = ->
       if req.readyState is 4 # ReadyState Complete
         successResultCodes = [200, 304]
-        result = JSON.parse req.responseText
+	result = {}
+	try
+          result = JSON.parse req.responseText
+        catch
+          result = message: req.responseText
         if req.status in successResultCodes
           resolve result
         else
