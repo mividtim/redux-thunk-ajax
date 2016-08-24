@@ -63,11 +63,12 @@ module.exports = function(options) {
       });
       try {
         return ajax(options).then(function(response) {
-          return dispatch({
+          dispatch({
             response: response,
             type: options.actions.complete,
             time: new Date()
           });
+          return typeof options.onComplete === "function" ? options.onComplete(response) : void 0;
         })["catch"](function(error) {
           return dispatch({
             type: options.actions.error,

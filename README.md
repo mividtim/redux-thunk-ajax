@@ -10,10 +10,22 @@ Usage:
         complete: "LOGIN_COMPLETE",
         error: "LOGIN_ERROR"
     };
-    // Avoid double-dispatching by including onlyif closure, to which is passed
-    // the getState method from the store
-    const login = ajaxThunk("/auth/login", LOGIN_ACTIONS, (getState) => !getState().auth.loggingIn);
-    const auth = function(state = {}, action) {
+    // Avoid double-dispatching by including onlyif closure, and add http
+    // headers with getHeaders closure, each to which is passed the getState
+    // method from the store
+    // Pass in onComplete closure if you need to do more than dispatch an action
+    const login = (payload) =>
+      ajaxThunk({
+        url: "/auth/login",
+        actions: LOGIN_ACTIONS,
+        payload,
+        onlyif: (getState) => !getState().auth.loggingIn,
+        // Poor example here, since we're logging in, but this is useful
+        // elsewhere
+        getHeaders: (getState) => Authorization: "JWT " + getState().auth.token,
+        onComplete: (getState, dispatch) => console.log arguments
+      });
+    const auth = (state = {}, action) => {
       switch(action.type) {
         case LOGIN_ACTIONS.request:
           return Object.assign({}, state, {
@@ -44,4 +56,3 @@ Usage:
     let reducer = combineReducers({ auth });
     let store = createStore(reducer, applyMiddleware(thunk));
     store.dispatch(login({ username: 'tim', password: 'bigSecret' }));
-
