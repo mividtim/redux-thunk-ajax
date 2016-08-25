@@ -36,7 +36,6 @@ module.exports = (options) ->
         ajax options
           .then (response) ->
             dispatch { response, type: options.actions.complete, time: new Date() }
-            console.log response
             options.onComplete? dispatch, getState, response
           .catch (error) ->
             dispatch type: options.actions.error, message: error

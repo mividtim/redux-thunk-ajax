@@ -66,7 +66,6 @@ module.exports = function(options) {
             type: options.actions.complete,
             time: new Date()
           });
-          console.log(response);
           return typeof options.onComplete === "function" ? options.onComplete(dispatch, getState, response) : void 0;
         })["catch"](function(error) {
           return dispatch({
