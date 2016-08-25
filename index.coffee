@@ -10,7 +10,7 @@ ajax = (options) ->
         try
           result = JSON.parse req.responseText
         catch
-          result = message: req.responseText
+          result.message = req.responseText
         if req.status in successResultCodes
           resolve result
         else
@@ -36,7 +36,8 @@ module.exports = (options) ->
         ajax options
           .then (response) ->
             dispatch { response, type: options.actions.complete, time: new Date() }
-            options.onComplete? response
+            console.log response
+            options.onComplete? dispatch, getState, response
           .catch (error) ->
             dispatch type: options.actions.error, message: error
       catch error

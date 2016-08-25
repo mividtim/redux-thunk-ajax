@@ -23,7 +23,7 @@ Usage:
         // Poor example here, since we're logging in, but this is useful
         // elsewhere
         getHeaders: (getState) => Authorization: "JWT " + getState().auth.token,
-        onComplete: (getState, dispatch) => console.log arguments
+        onComplete: (getState, dispatch, response) => console.log arguments
       });
     const auth = (state = {}, action) => {
       switch(action.type) {

@@ -16,9 +16,7 @@ ajax = function(options) {
         try {
           result = JSON.parse(req.responseText);
         } catch (error1) {
-          result = {
-            message: req.responseText
-          };
+          result.message = req.responseText;
         }
         if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
           return resolve(result);
@@ -68,7 +66,8 @@ module.exports = function(options) {
             type: options.actions.complete,
             time: new Date()
           });
-          return typeof options.onComplete === "function" ? options.onComplete(response) : void 0;
+          console.log(response);
+          return typeof options.onComplete === "function" ? options.onComplete(dispatch, getState, response) : void 0;
         })["catch"](function(error) {
           return dispatch({
             type: options.actions.error,
