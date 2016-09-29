@@ -9,7 +9,7 @@ ajax = function(options) {
     var complete, err, error1, key, ref, req, value;
     req = new XMLHttpRequest();
     complete = function() {
-      var error1, ref, result, successResultCodes;
+      var error, error1, ref, result, successResultCodes;
       if (req.readyState === 4) {
         successResultCodes = [200, 304];
         result = {};
@@ -21,8 +21,10 @@ ajax = function(options) {
         if (ref = req.status, indexOf.call(successResultCodes, ref) >= 0) {
           return resolve(result);
         } else {
-          result.status = req.status;
-          return reject(result);
+          error = new Error("Non-success status received in AJAX request");
+          error.status = req.status;
+          error.result = result;
+          return reject(error);
         }
       }
     };

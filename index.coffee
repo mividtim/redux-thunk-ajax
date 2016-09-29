@@ -14,8 +14,10 @@ ajax = (options) ->
         if req.status in successResultCodes
           resolve result
         else
-          result.status = req.status
-          reject result
+          error = new Error "Non-success status received in AJAX request"
+          error.status = req.status
+          error.result = result
+          reject error
     req.addEventListener "readystatechange", complete, no
     try
       req.open "POST", options.url
