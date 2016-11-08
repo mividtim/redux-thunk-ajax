@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "node node_modules/browserify/bin/cmd.js -t [ coffeeify --bare=true ] index.coffee --standalone ajax -o index.js"
+    "build": "browserify -t [ coffeeify --bare=true ] index.coffee --standalone ajax -o index.js"
   },
   "dependencies": {
     "bluebird": "^3.3.4"
